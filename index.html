@@ -172,14 +172,14 @@
             <li><a href="#audience">Pour qui ?</a></li>
         </ul>
     </nav>
-    <a href="#interest" class="btn track-click" id="interest-header-btn" data-event="clic_je_suis_interesse" data-clarity-label="clic-interet-header">Je suis intéressé</a>
+    <a href="#interest" class="btn track-click" id="interest-header-btn" data-event="clic_interet_header" data-clarity-label="clic-interet-header">Je suis intéressé</a>
 </header>
 
 <section class="hero">
     <h1>L'équilibre forêt-gibier à portée de main.</h1>
     <p>La plateforme digitale dédiée aux gestionnaires forestiers wallons pour diagnostiquer, suivre et analyser la pression du gibier.</p>
     <div class="hero-actions">
-        <a href="#interest" class="btn track-click" data-event="clic_je_suis_interesse" data-clarity-label="clic-interet-hero">Cela m'intéresse</a>
+        <a href="#interest" class="btn track-click" data-event="clic_interet_hero" data-clarity-label="clic-interet-hero">Cela m'intéresse</a>
         <a href="#priorities" class="btn secondary track-click" data-event="clic_fonctionnalites_hero" data-clarity-label="clic-fonctionnalites-hero">Voir les fonctionnalités</a>
     </div>
     
@@ -358,8 +358,6 @@
         <a href="#interest" class="btn secondary track-click" data-event="clic_donner_avis_footer" data-clarity-label="clic-donner-avis-footer" style="background-color: transparent; color: white; border-color: white;">Donner mon avis</a>
     </div>
     <p style="margin-top: 3rem; font-size: 0.8rem; opacity: 0.7;">&copy; 2026 ForestBalance. Prototype académique de landing page pour recueillir des retours sur une plateforme forêt-gibier.</p>
-
-<div id="local-click-summary" class="click-counter-box"></div>
 </footer>
 
 <script>
@@ -374,17 +372,7 @@
         const data = JSON.parse(localStorage.getItem(key) || "{}");
         data[eventName] = (data[eventName] || 0) + 1;
         localStorage.setItem(key, JSON.stringify(data));
-        
-    // 👇 Compteur de visites (une fois par session)
-    (function countVisit() {
-        const key = "forestbalance_visited";
-        if (!sessionStorage.getItem(key)) {
-            sessionStorage.setItem(key, "true");
-            trackEvent("visite_page");
-        }
-    })();
-
-    updateLocalSummary();
+        updateLocalSummary();
         console.log("Event tracked:", eventName, extraData);
     }
 
@@ -456,39 +444,15 @@
         });
     }
 
-    
     function updateLocalSummary() {
         const box = document.getElementById("local-click-summary");
         if (!box) return;
-
         const data = JSON.parse(localStorage.getItem("forestbalance_clicks") || "{}");
-
-        let text = "Statistiques locales :
-";
-
-        Object.entries(data).forEach(([key, value]) => {
-            text += key + " : " + value + "
-";
-        });
-
-        box.textContent = text;
-    }
-    ");
         const total = Object.values(data).reduce((a, b) => a + b, 0);
         if (total > 0) {
             box.textContent = "Compteur local de test : " + total + " interaction(s) enregistrée(s) sur ce navigateur.";
         }
     }
-    
-    // 👇 Compteur de visites (une fois par session)
-    (function countVisit() {
-        const key = "forestbalance_visited";
-        if (!sessionStorage.getItem(key)) {
-            sessionStorage.setItem(key, "true");
-            trackEvent("visite_page");
-        }
-    })();
-
     updateLocalSummary();
 </script>
 
