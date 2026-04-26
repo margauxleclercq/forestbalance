@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForestBalance — Suivi forêt-gibier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Microsoft Clarity : permet de suivre les clics, parcours, heatmaps et événements personnalisés. -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "wah8b20mdl");
+    </script>
+
+    <style>
+        :root {
+            --primary-green: #2E5C31;
+            --light-green: #E8F5E9;
+            --accent-green: #4CAF50;
+            --dark-text: #1A1A1A;
+            --light-text: #FFFFFF;
+            --gray-text: #666666;
+            --border-color: #E0E0E0;
+            --bg-color: #FAFAFA;
+            --soft-yellow: #FFF8E1;
+            --soft-blue: #EAF4FF;
+            --danger: #D32F2F;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { background-color: var(--bg-color); color: var(--dark-text); line-height: 1.6; }
+
+        header {
+            background-color: var(--light-text);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary-green); text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { text-decoration: none; color: var(--dark-text); font-weight: 600; transition: color 0.3s; }
+        nav a:hover { color: var(--accent-green); }
+
+        .btn {
+            background-color: var(--accent-green);
+            color: var(--light-text);
+            padding: 0.85rem 1.55rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .btn:hover { background-color: var(--primary-green); transform: translateY(-1px); }
+        .btn.secondary { background-color: var(--light-text); color: var(--primary-green); border: 2px solid var(--primary-green); }
+        .btn.secondary:hover { background-color: var(--primary-green); color: var(--light-text); }
+
+        .hero {
+            background: linear-gradient(rgba(46, 92, 49, 0.82), rgba(46, 92, 49, 0.82)), url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            color: var(--light-text);
+            text-align: center;
+            padding: 8rem 5%;
+        }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; line-height: 1.15; }
+        .hero p { font-size: 1.2rem; max-width: 850px; margin: 0 auto 2rem auto; opacity: 0.92; }
+        .hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .micro-copy { margin-top: 1.25rem; font-size: 0.92rem !important; opacity: 0.82 !important; }
+
+        section { padding: 5rem 5%; }
+        .section-title { text-align: center; font-size: 2.2rem; color: var(--primary-green); margin-bottom: 1rem; }
+        .section-subtitle { text-align: center; color: var(--gray-text); font-size: 1.1rem; max-width: 780px; margin: 0 auto 3rem auto; }
+
+        .comparison { display: flex; gap: 2rem; max-width: 1050px; margin: 0 auto; }
+        .comp-card { flex: 1; background: var(--light-text); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .comp-card h3 { color: var(--danger); margin-bottom: 1rem; font-size: 1.5rem; }
+        .comp-card.solution h3 { color: var(--accent-green); }
+        .comp-card ul { padding-left: 1.2rem; color: var(--gray-text); }
+
+        .how-it-works { background-color: var(--light-green); }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.5rem; max-width: 1150px; margin: 0 auto; }
+        .step-card { background: var(--light-text); border-radius: 8px; padding: 1.7rem; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
+        .step-number { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 1rem; }
+        .step-card h3 { color: var(--primary-green); margin-bottom: 0.6rem; }
+        .step-card p { color: var(--gray-text); }
+
+        .priorities { background-color: #FAFAFA; }
+        .priorities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; max-width: 1300px; margin: 0 auto; }
+        .priority-card {
+            background: var(--light-text);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .priority-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: var(--accent-green); }
+        .priority-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .priority-icon { font-size: 2rem; color: var(--accent-green); }
+        .priority-title { font-size: 1.35rem; font-weight: 700; color: var(--primary-green); }
+        .priority-features-list { list-style: none; margin-bottom: 1.5rem; }
+        .priority-feature-item { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border-color); }
+        .priority-feature-item:last-child { border-bottom: none; }
+        .feature-point-fort { color: var(--dark-text); font-weight: 600; font-size: 0.98rem; }
+        .feature-tag { background-color: #F0F0F0; color: #333; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.82rem; font-weight: 500; text-align: center; white-space: nowrap; }
+        .feature-tag.mvp { background: var(--light-green); color: var(--primary-green); }
+        .feature-tag.later { background: var(--soft-yellow); color: #7A5A00; }
+        .priority-description { font-size: 0.95rem; color: var(--gray-text); margin-bottom: 1.4rem; }
+        .priority-vote-btn { background-color: var(--light-green); color: var(--primary-green); padding: 0.8rem 1.2rem; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 0.95rem; text-align: center; transition: background-color 0.2s, color 0.2s; border: 2px solid var(--primary-green); display: block; width: 100%; }
+        .priority-vote-btn:hover { background-color: var(--primary-green); color: var(--light-text); }
+
+        .interest-panel { background-color: var(--light-green); }
+        .interest-box { max-width: 980px; margin: 0 auto; background: white; border-radius: 10px; padding: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid var(--border-color); }
+        .feature-choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .choice-card { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: #fff; display: flex; gap: 0.75rem; align-items: flex-start; cursor: pointer; transition: border-color .2s, background-color .2s; }
+        .choice-card:hover { border-color: var(--accent-green); background: #F7FCF8; }
+        .choice-card input { margin-top: 0.25rem; transform: scale(1.2); accent-color: var(--accent-green); }
+        .choice-card strong { display: block; color: var(--primary-green); margin-bottom: .25rem; }
+        .choice-card span { color: var(--gray-text); font-size: .93rem; }
+        .validation-message { display: none; margin-top: 1rem; padding: 1rem; border-radius: 8px; background: var(--light-green); color: var(--primary-green); font-weight: 600; }
+
+        .audience { background-color: var(--light-green); }
+        .audience-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+        .audience-item { background: var(--light-text); padding: 1.5rem; border-radius: 8px; }
+        .audience-item h4 { color: var(--primary-green); margin-bottom: 0.5rem; }
+        .audience-item p { color: var(--gray-text); }
+
+        .feedback-form { margin-top: 1.8rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .feedback-form label { display: block; color: var(--primary-green); font-weight: 700; margin-bottom: .5rem; }
+        .feedback-form textarea, .feedback-form input { width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: 'Inter', sans-serif; font-size: .98rem; margin-bottom: 1rem; }
+        .feedback-form textarea { min-height: 140px; resize: vertical; }
+        .feedback-hint { color: var(--gray-text); font-size: .92rem; margin-bottom: 1rem; }
+
+        footer { background-color: var(--primary-green); color: var(--light-text); text-align: center; padding: 3rem 5%; }
+        footer p { opacity: 0.92; }
+        .contact-buttons { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+        .click-counter-box { margin-top: 2rem; font-size: .86rem; opacity: .75; }
+
+        @media (max-width: 768px) {
+            nav ul { display: none; }
+            .comparison { flex-direction: column; }
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 6rem 5%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">ForestBalance</a>
+    <nav>
+        <ul>
+            <li><a href="#concept">Le concept</a></li>
+            <li><a href="#priorities">Fonctionnalités</a></li>
+            <li><a href="#interest">Votre avis</a></li>
+            <li><a href="#audience">Pour qui ?</a></li>
+        </ul>
+    </nav>
+    <a href="#interest" class="btn track-click" id="interest-header-btn" data-event="clic_interet_header" data-clarity-label="clic-interet-header">Je suis intéressé</a>
+</header>
+
+<section class="hero">
+    <h1>L'équilibre forêt-gibier à portée de main.</h1>
+    <p>La plateforme digitale dédiée aux gestionnaires forestiers wallons pour diagnostiquer, suivre et analyser la pression du gibier.</p>
+    <div class="hero-actions">
+        <a href="#interest" class="btn track-click" data-event="clic_interet_hero" data-clarity-label="clic-interet-hero">Cela m'intéresse</a>
+        <a href="#priorities" class="btn secondary track-click" data-event="clic_fonctionnalites_hero" data-clarity-label="clic-fonctionnalites-hero">Voir les fonctionnalités</a>
+    </div>
+    
+</section>
+
+<section id="concept">
+    <h2 class="section-title">De la complexité à l'action immédiate</h2>
+    <p class="section-subtitle">Les relevés liés à la pression du gibier existent, mais leur exploitation reste souvent difficile lorsqu’ils sont ponctuels, dispersés ou réalisés sur papier.</p>
+    <div class="comparison">
+        <div class="comp-card">
+            <h3>Situation actuelle</h3>
+            <ul>
+                <li>Relevés parfois longs ou peu fréquents.</li>
+                <li>Données dispersées entre carnets, fichiers, photos et rapports.</li>
+                <li>Difficulté à comparer l’évolution d’une parcelle dans le temps.</li>
+                <li>Partage d’information compliqué entre gestionnaires et institutions.</li>
+            </ul>
+        </div>
+        <div class="comp-card solution">
+            <h3>Avec ForestBalance</h3>
+            <ul>
+                <li>Collecte terrain guidée et standardisée.</li>
+                <li>Centralisation des observations et photos géolocalisées.</li>
+                <li>Indicateurs de pression et suivi temporel.</li>
+                <li>Exports et rapports pour faciliter l’analyse et les échanges.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2 class="section-title">Comment fonctionnerait la plateforme ?</h2>
+    <p class="section-subtitle">Le projet est volontairement cadré autour d’un MVP (Minimum Viable Product) réaliste : collecter, structurer, partager et aider à décider, sans remplacer l’expertise humaine.</p>
+    <div class="steps-grid">
+        <div class="step-card"><div class="step-number">1</div><h3>Relever</h3><p>Le gestionnaire encode les observations sur le terrain : dégâts, régénération, indices de présence et photos.</p></div>
+        <div class="step-card"><div class="step-number">2</div><h3>Centraliser</h3><p>Les données sont regroupées par parcelle, campagne de relevé et unité de gestion.</p></div>
+        <div class="step-card"><div class="step-number">3</div><h3>Visualiser</h3><p>Une carte et des indicateurs aident à repérer les zones à surveiller ou à prioriser.</p></div>
+        <div class="step-card"><div class="step-number">4</div><h3>Partager</h3><p>Les rapports et exports facilitent les échanges avec experts, propriétaires ou institutions.</p></div>
+    </div>
+</section>
+
+<section id="audience" class="audience">
+    <h2 class="section-title">Pour qui ?</h2>
+    <p class="section-subtitle">Le MVP est pensé en priorité pour les gestionnaires forestiers, propriétaires et institutions. Les sociétés de chasse peuvent être envisagées plus tard, mais ne constituent pas le cœur du projet actuel.</p>
+    <div class="audience-grid">
+        <div class="audience-item"><h4>Gestionnaires forestiers</h4><p>Suivre l’état des parcelles, conserver un historique et identifier les zones nécessitant une attention particulière.</p></div>
+        <div class="audience-item"><h4>Propriétaires forestiers</h4><p>Comprendre l’évolution des dégâts, disposer d’un dossier structuré et faciliter les échanges avec un expert.</p></div>
+        <div class="audience-item"><h4>Institutions publiques</h4><p>Accéder à des données consolidées et comparables pour soutenir la décision et les politiques de gestion durable.</p></div>
+    </div>
+</section>
+
+<section id="priorities" class="priorities">
+    <h2 class="section-title">Les fonctionnalités envisagées</h2>
+    <p class="section-subtitle">ForestBalance est pensé comme une plateforme progressive : un socle simple pour structurer les relevés terrain, puis des modules complémentaires pour mieux visualiser, partager et interpréter les données.</p>
+
+    <div class="priorities-grid">
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"><h3 class="priority-title">Relevés terrain guidés</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Formulaire de relevé simplifié</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Fonctionnement hors ligne avec synchronisation différée</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Photos géolocalisées</span><span class="feature-tag mvp">MVP</span></li>
+                </ul>
+                <p class="priority-description">Encadrer et faciliter la saisie des données sur le terrain, sans souci de réseau</p>
+            </div>
+        </div>
+
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"><h3 class="priority-title">Indicateur de pression</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Score de pression par parcelle</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Suivi de l’évolution</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Seuils d’alerte</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Comparaison entre zones</span><span class="feature-tag mvp">MVP</span></li>
+                </ul>
+                <p class="priority-description">Produire un indicateur de pression à partir des dégâts observés, de la régénération, des traces de fréquentation et de l’évolution des observations dans le temps.</p>
+            </div>
+        </div>
+
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"> <h3 class="priority-title">Tableau de bord et cartographie</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Carte interactive des parcelles à risque</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Vue globale d’un massif</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Filtres par période</span><span class="feature-tag mvp">MVP</span></li>
+                </ul>
+                <p class="priority-description">Représenter les données récoltées sous forme de carte et de tableau de bord afin d’identifier rapidement les parcelles problématiques, comparer les zones et suivre les tendances.</p>
+            </div>
+        </div>
+
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"><h3 class="priority-title">Aide à la décision</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Zones prioritaires d’intervention</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Diversification / protection</span><span class="feature-tag later">À valider</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Construction d'un plan de chasse</span><span class="feature-tag later">À valider</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Éléments pour discussion de gestion</span><span class="feature-tag mvp">MVP</span></li>
+                </ul>
+                <p class="priority-description">Fournir des signaux d’aide à la décision : parcelles à surveiller, besoin éventuel d’un suivi renforcé, intérêt d’un dispositif enclos-exclos ou éléments à discuter avec un expert forestier.</p>
+            </div>
+        </div>
+
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"> <h3 class="priority-title">Partage des données</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Accès partagé entre acteurs autorisés</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Exports PDF / Excel</span><span class="feature-tag mvp">MVP</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Dossier par parcelle</span><span class="feature-tag mvp">MVP</span></li>
+                </ul>
+                <p class="priority-description">Partager plus facilement et de manière contrôlée, les informations à un expert, un propriétaire ou une institution. </p>
+            </div>
+        </div>
+
+        <div class="priority-card">
+            <div>
+                <div class="priority-header"><h3 class="priority-title">Module optionnel caméra</h3></div>
+                <ul class="priority-features-list">
+                    <li class="priority-feature-item"><span class="feature-point-fort">Fréquence de passage du gibier</span><span class="feature-tag later">À valider</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Identification du type de gibier</span><span class="feature-tag later">À valider</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Indice de visites plutôt que comptage absolu</span><span class="feature-tag later">À valider</span></li>
+                    <li class="priority-feature-item"><span class="feature-point-fort">Lien avec dégâts observés</span><span class="feature-tag later">À valider</span></li>
+                </ul>
+                <p class="priority-description">Ce module serait complémentaire au relevé terrain. Une caméra pourrait aider à observer la fréquentation d’une zone, les périodes de passage et les espèces présentes.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin: 3rem auto 0; max-width: 850px; background: var(--light-green); padding: 2rem; border-radius: 10px; border: 1px solid var(--border-color);">
+        <h3 style="color: var(--primary-green); font-size: 1.45rem; margin-bottom: .75rem;">Votre avis nous aiderait à prioriser les modules</h3>
+        <p style="color: var(--gray-text); margin-bottom: 1.5rem;">Après avoir découvert les fonctionnalités, vous pouvez classer celles qui vous semblent les plus utiles et nous laisser un commentaire. Ces retours serviront à évaluer l’intérêt réel du projet.</p>
+        <a href="#interest" class="btn track-click" data-event="clic_classer_fonctionnalites" data-clarity-label="clic-classer-fonctionnalites">Classer les fonctionnalités qui m’intéressent</a>
+    </div>
+</section>
+
+<section id="interest" class="interest-panel">
+    <h2 class="section-title">Votre avis nous intéresse</h2>
+    <p class="section-subtitle">Sélectionnez les fonctionnalités qui vous semblent les plus utiles, puis laissez éventuellement un commentaire. Vous pouvez aussi nous envoyer directement votre avis par mail.</p>
+    <div class="interest-box">
+        <h3 style="color: var(--primary-green); margin-bottom: .5rem;">Quelles fonctionnalités voudriez-vous voir en priorité ?</h3>
+        <p style="color: var(--gray-text);">Vous pouvez en sélectionner plusieurs. Le clic sur “Valider mes choix” est enregistré comme événement dans Clarity afin d’identifier les priorités fonctionnelles.</p>
+
+        <div class="feature-choice-grid">
+            <label class="choice-card"><input type="checkbox" value="Relevés terrain guidés"><span><strong>Relevés terrain guidés</strong><span>Inventaires, photos, géolocalisation, offline.</span></span></label>
+            <label class="choice-card"><input type="checkbox" value="Indicateur de pression"><span><strong>Indicateur de pression</strong><span>Score simple par parcelle et suivi dans le temps.</span></span></label>
+            <label class="choice-card"><input type="checkbox" value="Cartographie"><span><strong>Tableau de bord et cartographie </strong><span>Carte des zones à risque et priorités d’intervention.</span></span></label>
+            <label class="choice-card"><input type="checkbox" value="Aide à la décision"><span><strong>Aide à la décision</strong><span>Suggestions : suivi renforcé, plan de chasse, protection.</span></span></label>
+            <label class="choice-card"><input type="checkbox" value="Partage des données"><span><strong>Partage des données</strong><span>Exports et accès contrôlé pour experts ou institutions.</span></span></label>
+            <label class="choice-card"><input type="checkbox" value="Caméras"><span><strong>Caméras</strong><span>Fréquence de visite, type de gibier, activité observée.</span></span></label>
+        </div>
+
+        <button class="btn track-click" id="submit-features" data-event="validation_choix_fonctionnalites" data-clarity-label="validation-choix-fonctionnalites">Valider mes choix</button>
+        <div id="validation-message" class="validation-message"></div>
+
+        <div class="feedback-form">
+            <h3 style="color: var(--primary-green); margin-bottom: .5rem;">Votre avis sur le projet</h3>
+            <p class="feedback-hint">Vous pouvez écrire ici ce qui vous semble utile, inutile, prioritaire ou irréaliste. Le bouton ci-dessous ouvrira votre messagerie avec un mail prérempli.</p>
+            <label for="visitor-profile">Votre profil ou structure (facultatif)</label>
+            <input id="visitor-profile" type="text" placeholder="Ex. propriétaire forestier, expert forestier, gestionnaire, institution...">
+            <label for="visitor-feedback">Votre commentaire</label>
+            <textarea id="visitor-feedback" placeholder="Ex. La fonctionnalité la plus utile selon moi serait... / Ce qui manquerait à l’outil... / Ce qui me semble difficile à mettre en place..."></textarea>
+            <button class="btn track-click" id="send-feedback-mail" data-event="clic_envoi_avis_mail" data-clarity-label="clic-envoi-avis-mail">Envoyer mon avis par mail</button>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+    <h2>Vous souhaitez donner votre avis sur ForestBalance ?</h2>
+    <p style="margin: 1.5rem auto; max-width: 760px;">Votre retour nous aidera à comprendre quelles fonctionnalités sont réellement utiles sur le terrain et à améliorer la proposition avant les entretiens avec les acteurs du secteur.</p>
+    <div class="contact-buttons">
+        <a href="mailto:Manon.Rustin@student.umons.ac.be,Margaux.Leclercq@student.umons.ac.be,Marie.Canfyn@student.umons.ac.be?subject=ForestBalance%20-%20Retour%20sur%20le%20projet" class="btn track-click" data-event="clic_contact_footer" data-clarity-label="clic-contact-footer" style="background-color: var(--light-text); color: var(--primary-green);">Nous contacter</a>
+        <a href="#interest" class="btn secondary track-click" data-event="clic_donner_avis_footer" data-clarity-label="clic-donner-avis-footer" style="background-color: transparent; color: white; border-color: white;">Donner mon avis</a>
+    </div>
+    <p style="margin-top: 3rem; font-size: 0.8rem; opacity: 0.7;">&copy; 2026 ForestBalance. Prototype académique de landing page pour recueillir des retours sur une plateforme forêt-gibier.</p>
+</footer>
+
+<script>
+    function trackEvent(eventName, extraData = {}) {
+        try {
+            if (typeof clarity === "function") {
+                clarity("event", eventName);
+            }
+        } catch (e) {}
+
+        const key = "forestbalance_clicks";
+        const data = JSON.parse(localStorage.getItem(key) || "{}");
+        data[eventName] = (data[eventName] || 0) + 1;
+        localStorage.setItem(key, JSON.stringify(data));
+        updateLocalSummary();
+        console.log("Event tracked:", eventName, extraData);
+    }
+
+    document.querySelectorAll(".track-click").forEach(el => {
+        el.addEventListener("click", function() {
+            const eventName = this.getAttribute("data-event") || "clic_non_nomme";
+            trackEvent(eventName, { label: this.getAttribute("data-clarity-label") });
+        });
+    });
+
+    document.querySelectorAll(".priority-vote-btn").forEach(button => {
+        button.addEventListener("click", function(e) {
+            e.preventDefault();
+            const priority = this.getAttribute("data-priority");
+            trackEvent("vote_priorite_" + priority, { priority });
+            document.getElementById("interest").scrollIntoView({ behavior: "smooth" });
+        });
+    });
+
+    const submitButton = document.getElementById("submit-features");
+    const validationMessage = document.getElementById("validation-message");
+
+    submitButton.addEventListener("click", function() {
+        const selected = Array.from(document.querySelectorAll(".choice-card input:checked")).map(cb => cb.value);
+        if (selected.length === 0) {
+            validationMessage.style.display = "block";
+            validationMessage.textContent = "Merci de sélectionner au moins une fonctionnalité avant de valider.";
+            trackEvent("validation_sans_selection");
+            return;
+        }
+
+        selected.forEach(feature => {
+            const safeName = feature.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+            trackEvent("selection_fonctionnalite_" + safeName, { feature });
+        });
+        trackEvent("validation_selection_fonctionnalites", { selected });
+
+        validationMessage.style.display = "block";
+        validationMessage.textContent = "Merci pour votre retour. Fonctionnalités sélectionnées : " + selected.join(", ") + ".";
+    });
+
+
+    const feedbackMailButton = document.getElementById("send-feedback-mail");
+    if (feedbackMailButton) {
+        feedbackMailButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            const profile = document.getElementById("visitor-profile").value.trim();
+            const feedback = document.getElementById("visitor-feedback").value.trim();
+            const selected = Array.from(document.querySelectorAll(".choice-card input:checked")).map(cb => cb.value);
+            trackEvent("envoi_avis_mail", { profile, selectedCount: selected.length });
+
+            const subject = "ForestBalance - Avis sur le projet";
+            const body = [
+                "Bonjour,",
+                "",
+                "Voici mon retour concernant le projet ForestBalance.",
+                "",
+                "Profil / structure : " + (profile || "Non précisé"),
+                "",
+                "Fonctionnalités sélectionnées : " + (selected.length ? selected.join(", ") : "Aucune sélection"),
+                "",
+                "Commentaire :",
+                feedback || "Non précisé",
+                "",
+                "Bien à vous"
+            ].join("%0D%0A");
+
+            window.location.href = "mailto:Manon.Rustin@student.umons.ac.be,Margaux.Leclercq@student.umons.ac.be,Marie.Canfyn@student.umons.ac.be?subject=" + encodeURIComponent(subject) + "&body=" + body;
+        });
+    }
+
+    function updateLocalSummary() {
+        const box = document.getElementById("local-click-summary");
+        if (!box) return;
+        const data = JSON.parse(localStorage.getItem("forestbalance_clicks") || "{}");
+        const total = Object.values(data).reduce((a, b) => a + b, 0);
+        if (total > 0) {
+            box.textContent = "Compteur local de test : " + total + " interaction(s) enregistrée(s) sur ce navigateur.";
+        }
+    }
+    updateLocalSummary();
+</script>
+
+</body>
+</html>
